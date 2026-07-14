@@ -45,27 +45,44 @@ func calculateColorDifference(a, b color.RGBA) float64 {
 }
 
 func (g *Game) Update() error {
-	g.debugColorDifference = calculateColorDifference(g.particles[0].particleColor, g.particles[1].particleColor)
+	g.debugColorDifference = calculateColorDifference(g.particles[0].particleColor, g.particles[1].particleColor)	
+	
+	
 
-	xDiff, yDiff := particleDistance(int(g.particles[0].xPos), int(g.particles[1].xPos), int(g.particles[0].yPos), int(g.particles[1].yPos))
+	redXPos, redYPos := g.particles[0].xPos, g.particles[0].yPos
+	// make red track nearest green
+	var nearestGreenDistance = worldHeight*2.0 // bigger than possible
+	var closestGreen int
+	for i := range g.particles {
+		if g.particles[i].particleColor.G == 255 {
+			offsetX, offsetY := particleOffset(int(redXPos), int(g.particles[i].xPos), int(redYPos), int(g.particles[i].yPos))
+			distance := particleDistance(offsetX, offsetY)
+			if distance < nearestGreenDistance {
+				nearestGreenDistance = distance
+				closestGreen = i
+			}
+		}		
+	}
+	//log.Printf("xdiff %d, yDiff %d", xDiff, yDiff)
 
-	log.Printf("xdiff %d, yDiff %d", xDiff, yDiff)
+	xDiff, yDiff := particleOffset(int(g.particles[0].xPos), int(g.particles[closestGreen].xPos), int(g.particles[0].yPos), int(g.particles[closestGreen].yPos))
+	distance := particleDistance(xDiff, yDiff)
 
 	// Follow the leader
 	//p[0] = red, p[1] = green
 	// if xdiff is positive, red is to the right of green, red needs to move negative(left)
-	if xDiff > 3 {
+	if xDiff > 3 && distance > 6{
 		g.particles[0].xVel = -3
-	} else if xDiff < -3{
+	} else if xDiff < -3 && distance > 6{
 		g.particles[0].xVel = 3
 	} else {
 		g.particles[0].xVel = 0
 	}
 
 	// if yDiff is positive red is below green, needs to move negative(up)
-	if yDiff > 3 {
+	if yDiff > 3 && distance > 6{
 		g.particles[0].yVel = -3
-	} else if yDiff < -3{
+	} else if yDiff < -3 && distance > 6{
 		g.particles[0].yVel = 3
 	} else {
 		g.particles[0].yVel = 0
@@ -100,7 +117,7 @@ func main() {
 
 	particles := createRedParticles(1)
 
-	particles = append(particles, createGreenParticles(1)...)
+	particles = append(particles, createGreenParticles(3)...)
 
 	game := &Game{
 		particles: particles,

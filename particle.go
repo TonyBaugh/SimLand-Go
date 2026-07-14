@@ -2,6 +2,7 @@ package main
 
 import (
 	"image/color"
+	"math"
 	"math/rand/v2"
 )
 
@@ -46,11 +47,16 @@ func (p *Particle) Update() {
 	}
 }
 
-func particleDistance(p1XDist, p2XDist, p1YDist, p2YDist int) (xDiff int, yDiff int) {
+func particleOffset(p1XDist, p2XDist, p1YDist, p2YDist int) (xDiff int, yDiff int) {
 	xDiff = p1XDist - p2XDist
 	yDiff = p1YDist - p2YDist
 
 	return xDiff, yDiff
+}
+
+func particleDistance(xDiff, yDiff int) (distance float64) {
+	//xdiff*xdiff + ydiff*ydiff = distance*2
+	return math.Sqrt(float64(xDiff*xDiff + yDiff*yDiff))
 }
 
 func createParticles(count int) []Particle {
@@ -96,8 +102,8 @@ func createGreenParticles(count int) []Particle {
 		particle := Particle{
 			xPos:          float32(rand.IntN(worldWidth-2*radius) + radius),
 			yPos:          float32(rand.IntN(worldHeight-2*radius) + radius),
-			xVel:          float32(2),
-			yVel:          float32(2),
+			xVel:          float32(0),
+			yVel:          float32(0),
 			radius:        float32(radius),
 			particleColor: color.RGBA{0, 255, 0, 255},
 		}
