@@ -48,8 +48,9 @@ func (g *Game) Update() error {
 	g.debugColorDifference = calculateColorDifference(g.particles[0].particleColor, g.particles[1].particleColor)	
 	
 	
-
+	blueParticleIndex := len(g.particles)-1
 	redXPos, redYPos := g.particles[0].xPos, g.particles[0].yPos
+	blueXPos, blueYPos := g.particles[blueParticleIndex].xPos, g.particles[blueParticleIndex].yPos
 	// make red track nearest green
 	var nearestGreenDistance = worldHeight*2.0 // bigger than possible
 	var closestGreen int
@@ -65,27 +66,65 @@ func (g *Game) Update() error {
 	}
 	//log.Printf("xdiff %d, yDiff %d", xDiff, yDiff)
 
-	xDiff, yDiff := particleOffset(int(g.particles[0].xPos), int(g.particles[closestGreen].xPos), int(g.particles[0].yPos), int(g.particles[closestGreen].yPos))
-	distance := particleDistance(xDiff, yDiff)
+	
+	grnRedXDiff, grnRedYDiff := particleOffset(int(g.particles[0].xPos), int(g.particles[closestGreen].xPos), int(g.particles[0].yPos), int(g.particles[closestGreen].yPos))
+	grnRedDistance := particleDistance(grnRedXDiff, grnRedYDiff)
 
-	// Follow the leader
+	
+	redBlueXDiff, redBlueYDiff := particleOffset(int(redXPos), int(blueXPos), int(redYPos), int(blueYPos))
+	redBlueDistance := particleDistance(redBlueXDiff, redBlueYDiff)
+
+	grnBlueXDiff, grnBlueYDiff := particleOffset(int(g.particles[blueParticleIndex].xPos), int(g.particles[closestGreen].xPos), int(g.particles[blueParticleIndex].yPos), int(g.particles[closestGreen].yPos))
+	grnBlueDistance := particleDistance(grnBlueXDiff, grnBlueYDiff)
+	//log.Printf("blue/red distance: %.0f", redBlueDistance)
+	
+	// Blue follows green
+	if grnBlueXDiff > 4 && grnBlueDistance > 6{
+		g.particles[blueParticleIndex].xVel = -4
+	} else if grnBlueXDiff < -4 && grnBlueDistance > 6{
+		g.particles[blueParticleIndex].xVel = 4
+	} else {
+		g.particles[blueParticleIndex].xVel = 0
+	}
+
+	if grnBlueYDiff > 4 && grnBlueDistance > 6{
+		g.particles[blueParticleIndex].yVel = -4
+	} else if grnBlueYDiff < -4 && grnBlueDistance > 6{
+		g.particles[blueParticleIndex].yVel = 4
+	} else {
+		g.particles[blueParticleIndex].yVel = 0
+	}
+
+	// red follows green
 	//p[0] = red, p[1] = green
 	// if xdiff is positive, red is to the right of green, red needs to move negative(left)
-	if xDiff > 3 && distance > 6{
+	if grnRedXDiff > 3 && grnRedDistance > 6{
 		g.particles[0].xVel = -3
-	} else if xDiff < -3 && distance > 6{
+	} else if grnRedXDiff < -3 && grnRedDistance > 6{
 		g.particles[0].xVel = 3
 	} else {
 		g.particles[0].xVel = 0
 	}
-
-	// if yDiff is positive red is below green, needs to move negative(up)
-	if yDiff > 3 && distance > 6{
+	
+	if grnRedYDiff > 3 && grnRedDistance > 6{
 		g.particles[0].yVel = -3
-	} else if yDiff < -3 && distance > 6{
+	} else if grnRedYDiff < -3 && grnRedDistance > 6{
 		g.particles[0].yVel = 3
 	} else {
 		g.particles[0].yVel = 0
+	}
+
+	// Blue is scared of red
+	if redBlueDistance < 150 {
+		if redBlueXDiff > 5 {
+			g.particles[blueParticleIndex].xVel = -5
+		} else if redBlueXDiff < -5 {
+			g.particles[blueParticleIndex].xVel = 5
+		} else if redBlueYDiff > 5 {
+			g.particles[blueParticleIndex].yVel = -5	
+		} else if redBlueYDiff < -5 {
+			g.particles[blueParticleIndex].yVel = 5	
+		}
 	}
 
 	for i := range g.particles {
@@ -117,7 +156,8 @@ func main() {
 
 	particles := createRedParticles(1)
 
-	particles = append(particles, createGreenParticles(3)...)
+	particles = append(particles, createGreenParticles(50)...)
+	particles = append(particles, createBlueParticles(1)...)
 
 	game := &Game{
 		particles: particles,
