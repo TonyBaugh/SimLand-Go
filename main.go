@@ -78,6 +78,20 @@ func (g *Game) Update() error {
 	grnBlueDistance := particleDistance(grnBlueXDiff, grnBlueYDiff)
 	//log.Printf("blue/red distance: %.0f", redBlueDistance)
 	
+	
+	// Blue is scared of red
+	if redBlueDistance < 150 {
+		if redBlueXDiff > 5 {
+			g.particles[blueParticleIndex].xVel = -5
+		} else if redBlueXDiff < -5 {
+			g.particles[blueParticleIndex].xVel = 5
+		} else if redBlueYDiff > 5 {
+			g.particles[blueParticleIndex].yVel = -5	
+		} else if redBlueYDiff < -5 {
+			g.particles[blueParticleIndex].yVel = 5	
+		}
+	}
+	
 	// Blue follows green
 	if grnBlueXDiff > 4 && grnBlueDistance > 6{
 		g.particles[blueParticleIndex].xVel = -4
@@ -114,18 +128,6 @@ func (g *Game) Update() error {
 		g.particles[0].yVel = 0
 	}
 
-	// Blue is scared of red
-	if redBlueDistance < 150 {
-		if redBlueXDiff > 5 {
-			g.particles[blueParticleIndex].xVel = -5
-		} else if redBlueXDiff < -5 {
-			g.particles[blueParticleIndex].xVel = 5
-		} else if redBlueYDiff > 5 {
-			g.particles[blueParticleIndex].yVel = -5	
-		} else if redBlueYDiff < -5 {
-			g.particles[blueParticleIndex].yVel = 5	
-		}
-	}
 
 	for i := range g.particles {
 		g.particles[i].Update()
@@ -156,7 +158,7 @@ func main() {
 
 	particles := createRedParticles(1)
 
-	particles = append(particles, createGreenParticles(50)...)
+	particles = append(particles, createGreenParticles(20)...)
 	particles = append(particles, createBlueParticles(1)...)
 
 	game := &Game{
