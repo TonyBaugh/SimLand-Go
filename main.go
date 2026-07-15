@@ -1,26 +1,17 @@
 package main
 
 import (
-	"fmt"
 	"image/color"
 	"log"
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 const (
 	worldWidth  = 1080
 	worldHeight = 1080
 )
-
-type Game struct {
-	particles            []Particle
-	RGBA                 color.RGBA
-	debugColorDifference float64
-}
 
 type RGBA struct {
 	R, G, B, A uint8
@@ -156,10 +147,10 @@ func main() {
 	ebiten.SetWindowSize(worldWidth, worldHeight)
 	ebiten.SetWindowTitle("Simland-Go")
 
-	particles := createRedParticles(1)
+	particles := createRedParticles(10)
 
-	particles = append(particles, createGreenParticles(20)...)
-	particles = append(particles, createBlueParticles(1)...)
+	particles = append(particles, createGreenParticles(50)...)
+	particles = append(particles, createBlueParticles(0)...)
 
 	game := &Game{
 		particles: particles,
