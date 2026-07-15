@@ -119,8 +119,8 @@ func createBlueParticles(count int) []Particle {
 		particle := Particle{
 			xPos:          float32(rand.IntN(worldWidth-2*radius) + radius),
 			yPos:          float32(rand.IntN(worldHeight-2*radius) + radius),
-			xVel:          float32(5),
-			yVel:          float32(5),
+			xVel:          float32(3),
+			yVel:          float32(3),
 			radius:        float32(radius),
 			particleColor: color.RGBA{0, 0, 255, 255},
 		}
