@@ -10,12 +10,17 @@ import (
 
 const (
 	worldWidth  = 1080
-	worldHeight = 1080
+	worldHeight = 1080	
 )
 
 type RGBA struct {
 	R, G, B, A uint8
 }
+var (
+	redColor   = color.RGBA{R: 255, G: 0, B: 0, A: 255}
+	greenColor = color.RGBA{R: 0, G: 255, B: 0, A: 255}
+	blueColor  = color.RGBA{R: 0, G: 0, B: 255, A: 255}
+)
 
 func calculateColorDifference(a, b color.RGBA) float64 {
 	redColorA := int(a.R)
@@ -39,9 +44,9 @@ func main() {
 	ebiten.SetWindowSize(worldWidth, worldHeight)
 	ebiten.SetWindowTitle("Simland-Go")
 
-	particles := createRedParticles(10)
+	particles := createRedParticles(5)
 
-	particles = append(particles, createGreenParticles(50)...)
+	particles = append(particles, createGreenParticles(10)...)
 	particles = append(particles, createBlueParticles(0)...)
 
 	game := &Game{

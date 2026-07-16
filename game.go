@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"image/color"
+	
+	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -45,35 +47,61 @@ func (g *Game) Update() error {
 	// redXPos, redYPos := g.particles[0].xPos, g.particles[0].yPos
 	// blueXPos, blueYPos := g.particles[blueParticleIndex].xPos, g.particles[blueParticleIndex].yPos
 
+	var (		
+		eatenGreen = -1				
+	)	
+	var greensToBeAdded []Particle
+	
 	// Find closest green to red dot
-
 	for i := range g.particles {
-		if g.particles[i].particleColor.R == 255 {
+		if g.particles[i].particleColor == greenColor {
+				g.particles[i].distanceTraveled += math.Abs(float64(g.particles[i].xVel)) + math.Abs(float64(g.particles[i].yVel))
+				
+				if g.particles[i].distanceTraveled > 500 {
+					greensToBeAdded = append(greensToBeAdded, createGreenParticles(1)...)
+					g.particles[i].distanceTraveled = 0
+				}
+			}
+		if g.particles[i].particleColor == redColor {
 			closestGreenToRed, nearestGreenDistanceToRed, offsetX, offsetY :=
-				g.FindClosestParticle(i, color.RGBA{0, 255, 0, 255})
+				g.FindClosestParticle(i, greenColor)
 
 			if closestGreenToRed == -1 {
 				continue
 			}
+			
+			
+			//  Check if red is close enough to eat green
+			if nearestGreenDistanceToRed < 6 {									
+				eatenGreen = closestGreenToRed
+				break
+			}
 
 			if offsetX > 3 && nearestGreenDistanceToRed > 6 {
-				g.particles[i].xVel = -3
+				g.particles[i].xVel = -5
 			} else if offsetX < -3 && nearestGreenDistanceToRed > 6 {
-				g.particles[i].xVel = 3
+				g.particles[i].xVel = 5
 			} else {
 				g.particles[i].xVel = 0
 			}
 
 			if offsetY > 3 && nearestGreenDistanceToRed > 6 {
-				g.particles[i].yVel = -3
+				g.particles[i].yVel = -5
 			} else if offsetY < -3 && nearestGreenDistanceToRed > 6 {
-				g.particles[i].yVel = 3
+				g.particles[i].yVel = 5
 			} else {
 				g.particles[i].yVel = 0
 			}
 
 		}
+	
 	}
+	// Rebuild list with eatenGreen cut out of it, preserving order.
+	if eatenGreen != -1 { 
+		g.particles = append(g.particles[0:eatenGreen], g.particles[eatenGreen+1:]... )
+	}
+	g.particles = append(g.particles, greensToBeAdded...)
+	
 
 	// red follows green
 	// if xdiff is positive, red is to the right of green, red needs to move negative(left)

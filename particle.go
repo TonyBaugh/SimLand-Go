@@ -13,6 +13,7 @@ type Particle struct {
 	yVel          float32
 	radius        float32
 	particleColor color.RGBA
+	distanceTraveled float64
 }
 
 const (
@@ -71,6 +72,7 @@ func createParticles(count int) []Particle {
 			yVel:          float32(rand.IntN(maxYVel) + 1),
 			radius:        float32(radius),
 			particleColor: color.RGBA{uint8(rand.IntN(256)), uint8(rand.IntN(256)), uint8(rand.IntN(256)), 255},
+			distanceTraveled: 0,
 		}
 		particleList = append(particleList, particle)
 	}
@@ -85,10 +87,11 @@ func createRedParticles(count int) []Particle {
 		particle := Particle{
 			xPos:          float32(rand.IntN(worldWidth-2*radius) + radius),
 			yPos:          float32(rand.IntN(worldHeight-2*radius) + radius),
-			xVel:          float32(3),
-			yVel:          float32(3),
+			xVel:          float32(5),
+			yVel:          float32(5),
 			radius:        float32(radius),
-			particleColor: color.RGBA{255, 0, 0, 255},
+			particleColor: redColor,
+			distanceTraveled: 0,
 		}
 		particleList = append(particleList, particle)
 	}
@@ -102,15 +105,17 @@ func createGreenParticles(count int) []Particle {
 		particle := Particle{
 			xPos:          float32(rand.IntN(worldWidth-2*radius) + radius),
 			yPos:          float32(rand.IntN(worldHeight-2*radius) + radius),
-			xVel:          float32(5),
-			yVel:          float32(5),
+			xVel:          float32(3),
+			yVel:          float32(3),
 			radius:        float32(radius),
-			particleColor: color.RGBA{0, 255, 0, 255},
+			particleColor: greenColor,
+			distanceTraveled: 0,
 		}
 		particleList = append(particleList, particle)
 	}
 	return particleList
 }
+
 func createBlueParticles(count int) []Particle {
 	particleList := make([]Particle, 0, count)
 	radius := 3
@@ -122,7 +127,8 @@ func createBlueParticles(count int) []Particle {
 			xVel:          float32(3),
 			yVel:          float32(3),
 			radius:        float32(radius),
-			particleColor: color.RGBA{0, 0, 255, 255},
+			particleColor: blueColor,
+			distanceTraveled: 0,
 		}
 		particleList = append(particleList, particle)
 	}
